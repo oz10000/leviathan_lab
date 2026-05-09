@@ -1,28 +1,45 @@
 exchange: okx
-testnet: true
-capital_initial: 1000.0           # USDT
+testnet: false
+capital_initial: 1000.0
 universe_size: 40
-universe_min_vol24h: 2000000
-timeframes:
-  primary: ["5m", "15m"]
-  auxiliary: ["1m", "3m", "30m", "1h", "4h"]
+universe_min_vol24h: 2_000_000
+data_dir: data/parquet
+timeframes: ["1m", "3m", "5m", "15m", "1h", "4h"]
+
 fees:
   taker: 0.0005
   maker: 0.0002
+
 slippage:
   base_bps: 1.0
   atr_factor: 0.02
+  vol_factor: 0.01
+  liquidity_factor: 0.5
+
 latency:
   mean_ms: 150
   jitter_ms: 50
+
 backtest:
   days_history: 90
-  train_test_split: 0.7           # 70% train, 30% walk‑forward test
-monte_carlo:
-  runs: 200
+  train_ratio: 0.7
+  monte_carlo_runs: 200
+
 risk:
-  max_dd_limit: 0.12
-  max_position_pct: 0.4
-  degradation_threshold: 0.35
+  max_portfolio_dd: 0.15
+  max_strategy_dd: 0.12
   min_sharpe: 1.5
   min_pf: 1.4
+  degradation_threshold: 0.35
+
+portfolio:
+  rebalance_freq_hours: 24
+  max_concentration: 0.4
+  volatility_target: 0.02
+
+persistence:
+  db_path: storage/leviathan.duckdb
+
+telemetry:
+  log_level: INFO
+  live_print: true
