@@ -1,0 +1,23 @@
+name: Leviathan Backtest
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run backtest
+        run: python main.py --mode backtest --all
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: backtest-results
+          path: artifacts/backtests/
