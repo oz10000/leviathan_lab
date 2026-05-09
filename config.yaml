@@ -1,0 +1,28 @@
+exchange: okx
+testnet: true
+capital_initial: 1000.0           # USDT
+universe_size: 40
+universe_min_vol24h: 2000000
+timeframes:
+  primary: ["5m", "15m"]
+  auxiliary: ["1m", "3m", "30m", "1h", "4h"]
+fees:
+  taker: 0.0005
+  maker: 0.0002
+slippage:
+  base_bps: 1.0
+  atr_factor: 0.02
+latency:
+  mean_ms: 150
+  jitter_ms: 50
+backtest:
+  days_history: 90
+  train_test_split: 0.7           # 70% train, 30% walk‑forward test
+monte_carlo:
+  runs: 200
+risk:
+  max_dd_limit: 0.12
+  max_position_pct: 0.4
+  degradation_threshold: 0.35
+  min_sharpe: 1.5
+  min_pf: 1.4
