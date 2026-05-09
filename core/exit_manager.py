@@ -1,34 +1,30 @@
 import numpy as np
-from config.settings import EXIT_PARAMS  # to be set
 
 class HybridExit:
-    DEFAULT_TP_ATR = 2.5
-    DEFAULT_SL_ATR = 0.7
-    DEFAULT_BE_ATR = 0.6
-    DEFAULT_TRAIL_ATR = 1.3
-    DEFAULT_TIME_DECAY_MIN = 180
-    DEFAULT_VOL_CONTRACTION_RATIO = 0.7
-
-    def __init__(self, **kwargs):
-        self.tp_atr = kwargs.get('tp_atr', self.DEFAULT_TP_ATR)
-        self.sl_atr = kwargs.get('sl_atr', self.DEFAULT_SL_ATR)
-        self.be_atr = kwargs.get('be_atr', self.DEFAULT_BE_ATR)
-        self.trail_atr = kwargs.get('trail_atr', self.DEFAULT_TRAIL_ATR)
-        self.time_decay_min = kwargs.get('time_decay_min', self.DEFAULT_TIME_DECAY_MIN)
-        self.vol_contraction_ratio = kwargs.get('vol_contraction_ratio', self.DEFAULT_VOL_CONTRACTION_RATIO)
+    def __init__(self, tp_atr=2.5, sl_atr=0.7, be_atr=0.6, trail_atr=1.3,
+                 time_decay_min=180, vol_contraction_ratio=0.7):
+        self.tp_atr = tp_atr
+        self.sl_atr = sl_atr
+        self.be_atr = be_atr
+        self.trail_atr = trail_atr
+        self.time_decay_min = time_decay_min
+        self.vol_contraction_ratio = vol_contraction_ratio
 
     def should_exit(self, pos, price, now, atr_hist):
-        d = pos['dir']; entry = pos['entry']; atr = pos['atr']
+        d = pos['dir']
+        entry = pos['entry']
+        atr = pos['atr']
         tp = entry + d * self.tp_atr * atr
         sl = pos.get('sl', entry - d * self.sl_atr * atr)
         trail_sl = pos.get('trail_sl', sl)
-        be = pos.get('be', False); trail = pos.get('trail', False)
+        be = pos.get('be', False)
+        trail = pos.get('trail', False)
 
         if not be:
             be_th = entry + d * self.be_atr * atr
             if (d == 1 and price >= be_th) or (d == -1 and price <= be_th):
                 be = True
-                cost = entry * 0.001
+                cost = entry * 0.001  # approximate fees
                 sl = entry + d * cost
                 trail_sl = sl
         if be and not trail:
@@ -53,6 +49,8 @@ class HybridExit:
         if (d == 1 and price <= trail_sl) or (d == -1 and price >= trail_sl):
             return True, "trailing_sl", trail_sl, {}
 
-        pos['be'] = be; pos['trail'] = trail
-        pos['trail_sl'] = trail_sl; pos['sl'] = sl
+        pos['be'] = be
+        pos['trail'] = trail
+        pos['trail_sl'] = trail_sl
+        pos['sl'] = sl
         return False, None, None, pos
